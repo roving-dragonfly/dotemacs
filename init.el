@@ -165,6 +165,12 @@
 						 (not (sp-point-in-string-or-comment))))
 					    (t (not (sp-point-in-string-or-comment)))))))))
 
+;; Avy
+(use-package avy
+  :ensure t
+  :bind (("C-j"   . avy-goto-word-1)
+	 ("C-S-j" . avy-goto-line)))
+
 ;; Wsbutler
 (use-package ws-butler
   :ensure t
