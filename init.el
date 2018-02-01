@@ -32,6 +32,10 @@
 (global-set-key (kbd "C-M-s") 'isearch-forward)
 (global-set-key (kbd "C-M-r") 'isearch-backward)
 
+;; Diminish
+(use-package diminish
+  :ensure t)
+
 ;; Helm stuff
 (use-package helm
   :ensure t
@@ -62,6 +66,7 @@
 ;; Projectile
 (use-package projectile
   :ensure t
+  :diminish
   :init (projectile-global-mode)
   :bind (("<f12>" . projectile-compile-project))
   :config (progn
@@ -72,13 +77,50 @@
   :ensure t
   :bind ("C-x g" . magit-status))
 
+;;; C
+(use-package helm-gtags
+  :ensure t
+  :diminish
+  :init (progn
+	  (setq
+	   helm-gtags-ignore-case t
+	   helm-gtags-auto-update t
+	   helm-gtags-use-input-at-cursor t
+	   helm-gtags-pulse-at-cursor t
+	   helm-gtags-prefix-key "\C-cg"
+	   helm-gtags-suggested-key-mapping t)
+	  (unbind-key "C-M-j" c-mode-map))
+  :bind (("C-c g a"  . helm-gtags-tags-in-this-function)
+	 ("C-M-j"    . helm-gtags-select)
+	 ("M-."      . helm-gtags-dwim)
+	 ("M-,"      . helm-gtags-pop-stack))
+  :config (progn
+	    (add-hook 'dired-mode-hook 'helm-gtags-mode)
+	    (add-hook 'eshell-mode-hook 'helm-gtags-mode)
+	    (add-hook 'c-mode-hook 'helm-gtags-mode)
+	    (add-hook 'c++-mode-hook 'helm-gtags-mode)
+	    (add-hook 'asm-mode-hook 'helm-gtags-mode)))
+
+(use-package function-args
+  :ensure t
+  :config (fa-config-default)
+  )
+
 ;; Undo tree
 (use-package undo-tree
   :ensure t
-  :diminish undo-tree-mode
-  :config
-  (progn
+  :diminish
+  :config (progn
     (global-undo-tree-mode)
     (setq undo-tree-visualizer-timestamps t)
     (setq undo-tree-visualizer-diff t)))
 
+;; Guide key
+(use-package guide-key
+  :ensure t
+  :config (progn
+	    (setq guide-key/guide-key-sequence '("C-x" "C-c" "C-h")
+		  guide-key/idle-delay 0.4
+		  guide-key/recursive-key-sequence-flag t
+		  guide-key/popup-window-position 'right)
+	    (guide-key-mode 1)))
