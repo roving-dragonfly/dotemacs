@@ -24,7 +24,7 @@
 
 ;; Random
 (fset 'yes-or-no-p 'y-or-n-p)
-(load-theme 'metalheart)
+(load-theme 'metalheart t)
 
 ;; Better defaults
 (global-set-key (kbd "C-x C-b") 'ibuffer)
@@ -89,8 +89,7 @@
 	   helm-gtags-use-input-at-cursor t
 	   helm-gtags-pulse-at-cursor t
 	   helm-gtags-prefix-key "\C-cg"
-	   helm-gtags-suggested-key-mapping t)
-	  (unbind-key "C-M-j" c-mode-map))
+	   helm-gtags-suggested-key-mapping t))
   :bind (("C-c g a"  . helm-gtags-tags-in-this-function)
 	 ("C-M-j"    . helm-gtags-select)
 	 ("M-."      . helm-gtags-dwim)
