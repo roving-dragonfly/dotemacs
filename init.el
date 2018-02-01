@@ -63,7 +63,6 @@
 		  helm-apropos-fuzzy-match t
 		  helm-recentf-fuzzy-match t)))
 
-
 ;; Projectile
 (use-package projectile
   :ensure t
@@ -77,6 +76,14 @@
 (use-package magit
   :ensure t
   :bind ("C-x g" . magit-status))
+
+;; Company
+(use-package company
+  :ensure t
+  :init (global-company-mode)
+  :config (progn
+	    (setq company-tooltip-limit 20)
+	    (setq company-idle-delay 0.2)))
 
 ;;; C
 (use-package helm-gtags
@@ -103,8 +110,29 @@
 
 (use-package function-args
   :ensure t
-  :config (fa-config-default)
-  )
+  :config (progn
+	    (global-semantic-idle-summary-mode 1)
+	    (fa-config-default)))
+
+
+;; Smartparens
+(use-package smartparens
+  :ensure t
+  :config (progn
+	    (show-smartparens-global-mode +1)
+	    (smartparens-global-mode 1)))
+
+;; Wsbutler
+(use-package ws-butler
+  :ensure t
+  :diminish
+  :config (add-hook 'c-mode-common-hook 'ws-butler-mode))
+
+;; Dtrt indent
+(use-package dtrt-indent
+  :ensure t
+  :diminish
+  :config (dtrt-indent-mode 1))
 
 ;; Undo tree
 (use-package undo-tree
