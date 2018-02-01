@@ -1,3 +1,5 @@
+;;; Config emacs
+
 ;; Package
 (require 'package)
 (setq package-enable-at-startup nil)
@@ -47,27 +49,23 @@
 	 ("M-y"       . helm-show-kill-ring)
 	 ("C-x b"     . helm-mini)
 	 ("C-h a"     . helm-apropos)
+	 ("C-S"       . helm-occur)
 	 ("C-c h"     . helm-command-prefix))
   :config (progn
 	    (require 'helm-config)
 	    (global-unset-key (kbd "C-x c"))
 	    (helm-mode 1)
-	    (setq helm-split-window-in-side-p t
+	    (setq helm-split-window-inside-p t
 		  helm-autoresize-max-height 42
 		  helm-autoresize-min-height 0
 		  helm-move-to-line-cycle-in-source t
-		  helm-ff-search-library-in-sexp t
-		  helm-M-x-fuzzy-match t
-		  Helm-buffers-fuzzy-matching t
-		  helm-lisp-fuzzy-completion t
-		  helm-apropos-fuzzy-match t
-		  helm-recentf-fuzzy-match t)))
+		  helm-ff-search-library-in-sexp t)))
 
 ;; Projectile
 (use-package projectile
   :ensure t
   :diminish
-  :init (projectile-global-mode)
+  :init (projectile-mode)
   :bind (("<f12>" . projectile-compile-project))
   :config (progn
 	    (setq projectile-completion-system 'helm)))
@@ -84,6 +82,11 @@
   :config (progn
 	    (setq company-tooltip-limit 20)
 	    (setq company-idle-delay 0.2)))
+
+;; Flycheck
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
 
 ;;; C
 (use-package helm-gtags
@@ -115,12 +118,52 @@
 	    (fa-config-default)))
 
 
+;; Orgmode
+(use-package org
+  :bind (("C-c c"  . org-capture)
+	 ("C-c a"  . org-agenda)
+	 ("C-c l"  . org-store-link))
+  :config (progn
+	    (setq org-directory "~/org")
+	    (setq org-agenda-files
+		  (mapcar (lambda (path) (concat org-directory path))
+			  '("/gtd.org")))
+            (setq org-log-done 'time)
+	    (setq org-src-fontify-natively t)
+	    (setq org-use-fast-todo-selection t)
+	    (setq org-todo-keywords
+		  '((sequence "TODO(t)" "NEXT(n)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+	    (setq org-capture-templates
+		  '(("t" "Todo" entry (file+headline (concat org-directory "/gtd.org") "Tasks")
+		     "* TODO %?\n")
+		    ("i" "Idea" entry (file+headline (concat org-directory "/gtd.org") "Ideas")
+		     "* %? :IDEA: \n%t")
+		    ("j" "Journal" entry (file+datetree (concat org-directory "/journal.org"))
+		     "* %?\nEntered on %U\n  %i\n ")
+		    ("l" "Links" item (file+headline (concat org-directory "/links.org") "Temporary Links")
+		     "%?\nEntered on %U\n %a")))))
+
 ;; Smartparens
 (use-package smartparens
   :ensure t
   :config (progn
 	    (show-smartparens-global-mode +1)
-	    (smartparens-global-mode 1)))
+	    (smartparens-global-mode 1)
+	    (smartparens-strict-mode)
+	    (setq sp-base-key-bindings 'paredit)
+	    (sp-with-modes sp-lisp-modes
+	      ;; disable ', it's the quote character!
+	      (sp-local-pair "'" nil :actions nil)
+	      ;; also only use the pseudo-quote inside strings where it serve as
+	      ;; hyperlink.
+	      (sp-local-pair "`" "'" :when '(sp-in-string-p sp-in-comment-p))
+	      (sp-local-pair "`" nil
+			     :skip-match (lambda (ms mb me)
+					   (cond
+					    ((equal ms "'")
+					     (or (sp--org-skip-markup ms mb me)
+						 (not (sp-point-in-string-or-comment))))
+					    (t (not (sp-point-in-string-or-comment)))))))))
 
 ;; Wsbutler
 (use-package ws-butler
@@ -146,6 +189,7 @@
 ;; Guide key
 (use-package guide-key
   :ensure t
+  :diminish
   :config (progn
 	    (setq guide-key/guide-key-sequence '("C-x" "C-c" "C-h")
 		  guide-key/idle-delay 0.4
