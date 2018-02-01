@@ -24,6 +24,7 @@
 
 ;; Random
 (fset 'yes-or-no-p 'y-or-n-p)
+(load-theme 'metalheart)
 
 ;; Better defaults
 (global-set-key (kbd "C-x C-b") 'ibuffer)
