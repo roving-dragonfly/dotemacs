@@ -111,13 +111,14 @@
 	    (add-hook 'c++-mode-hook 'helm-gtags-mode)
 	    (add-hook 'asm-mode-hook 'helm-gtags-mode)))
 
+;; Function args, could be useful but needs more refined approach
 (use-package function-args
   :ensure t
+  :bind (("C-M-j"  . moo-jump-local))
   :config (progn
-	    (global-semantic-idle-summary-mode 1)
-	    (fa-config-default)))
-;; Clojure
+	    (global-semantic-idle-summary-mode 1)))
 
+;; Clojure
 (use-package clojure-mode
   :ensure t
   :config (add-to-list 'auto-mode-alist '("\\.boot\\'" . clojure-mode)))
