@@ -116,7 +116,18 @@
   :config (progn
 	    (global-semantic-idle-summary-mode 1)
 	    (fa-config-default)))
+;; Clojure
 
+(use-package clojure-mode
+  :ensure t
+  :config (add-to-list 'auto-mode-alist '("\\.boot\\'" . clojure-mode)))
+
+(use-package cider
+  :ensure t
+  :config (progn
+			(add-hook 'clojure-mode-hook 'cider-mode)
+			(add-hook 'cider-repl-mode-hook #'company-mode)
+			(add-hook 'cider-mode-hook #'company-mode)))
 
 ;; Orgmode
 (use-package org
@@ -140,6 +151,8 @@
 		     "* %? :IDEA: \n%t")
 		    ("j" "Journal" entry (file+datetree (concat org-directory "/journal.org"))
 		     "* %?\nEntered on %U\n  %i\n ")
+			("n" "Note" entry (file (concat org-directory "/notes.org"))
+		     "* %?\n")
 		    ("l" "Links" item (file+headline (concat org-directory "/links.org") "Temporary Links")
 		     "%?\nEntered on %U\n %a")))))
 
