@@ -1,0 +1,467 @@
+#+TITLE: Emacs configuration file
+#+AUTHOR: rd
+* Package
+
+Package init, melpa as the alternative archive
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+(setq package-enable-at-startup nil)
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+			 ("melpa" . "https://melpa.org/packages/")))
+(package-initialize)
+#+END_SRC
+
+Install & config done via use-package, bootstapped below
+#+BEGIN_SRC emacs-lisp
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+#+END_SRC
+
+* Gui cleanup
+
+Removes bloat in the interface
+#+BEGIN_SRC emacs-lisp
+(menu-bar-mode -1)
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))
+(when (fboundp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
+(when (fboundp 'horizontal-scroll-bar-mode)
+  (horizontal-scroll-bar-mode -1))
+#+END_SRC
+
+* Storing
+
+Sets various variables for storing purposes
+#+BEGIN_SRC emacs-lisp
+(setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
+(setq custom-file (concat user-emacs-directory "custom.el"))
+#+END_SRC
+
+* Misc
+
+#+BEGIN_SRC emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+(load-theme 'metalheart t)
+(put 'dired-find-alternate-file 'disabled nil)
+(require 'cl)
+#+END_SRC 
+
+** Diminish
+Diminish for a clean modeline
+#+BEGIN_SRC emacs-lisp 
+(use-package diminish
+  :ensure t)
+#+END_SRC
+
+** Edit server
+Emacs even on browser !
+#+BEGIN_SRC emacs-lisp
+(use-package edit-server
+  :ensure t
+  :config (edit-server-start))
+#+END_SRC
+
+
+** Dtrt indent
+Easy indent on various files
+#+BEGIN_SRC emacs-lisp
+(use-package dtrt-indent
+  :ensure t
+  :diminish
+  :config (dtrt-indent-mode 1))
+#+END_SRC
+* Change default keymap
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "C-S-s") 'isearch-forward-regexp)
+(global-set-key (kbd "C-r") 'isearch-backward-regexp)
+(global-set-key (kbd "C-M-s") 'isearch-forward)
+(global-set-key (kbd "C-M-r") 'isearch-backward)
+#+END_SRC
+* Helm
+
+The best shiet since oignon rings
+#+BEGIN_SRC emacs-lisp
+(use-package helm
+  :ensure t
+  :init (use-package helm-projectile :ensure t)
+  :bind (("M-x"       . helm-M-x)
+	 ("C-x C-f"   . helm-find-files)
+	 ("M-y"       . helm-show-kill-ring)
+	 ("C-x b"     . helm-mini)
+	 ("C-h a"     . helm-apropos)
+	 ("C-s"       . helm-occur)
+	 ("C-c h"     . helm-command-prefix))
+  :config
+  (require 'helm-config)
+  (global-unset-key (kbd "C-x c"))
+  (helm-mode 1)
+  (setq helm-split-window-inside-p t
+	helm-autoresize-max-height 42
+	helm-autoresize-min-height 0
+	helm-move-to-line-cycle-in-source t
+	helm-ff-search-library-in-sexp t))
+#+END_SRC
+* Projectile
+
+For all your project management needs
+#+BEGIN_SRC emacs-lisp
+(use-package projectile
+  :ensure t
+  :diminish
+  :init (projectile-mode)
+  :bind (("<f12>" . projectile-compile-project))
+  :config (setq projectile-completion-system 'helm))
+#+END_SRC
+
+* Magit
+
+Git wizardry
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :ensure t
+  :bind ("C-x g" . magit-status))
+#+END_SRC
+* Company
+
+Completion utilities
+#+BEGIN_EXAMPLE elisp
+(use-package company
+  :ensure t
+  :init (global-company-mode)
+  :config
+  (setq company-tooltip-limit 20)
+  (setq company-idle-delay 0.2)
+  (setq company-minimum-prefix-length 2))
+#+END_EXAMPLE
+* Flycheck
+
+Syntax checking
+#+BEGIN_EXAMPLE elisp
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+#+END_EXAMPLE
+* C
+** Helm Gtags
+
+#+BEGIN_SRC emacs-lisp
+(use-package helm-gtags
+  :ensure t
+  :diminish
+  :init (setq
+	 helm-gtags-ignore-case t
+	 helm-gtags-auto-update t
+	 helm-gtags-use-input-at-cursor t
+	 helm-gtags-pulse-at-cursor t
+	 helm-gtags-prefix-key "\C-cg"
+	 helm-gtags-suggested-key-mapping t)
+  :bind (("C-c g a"  . helm-gtags-tags-in-this-function)
+	 ("C-M-j"    . helm-gtags-select) ; Assigned to moo-jump, change later
+	 ("M-."      . helm-gtags-dwim)
+	 ("M-,"      . helm-gtags-pop-stack))
+  :config
+  (add-hook 'dired-mode-hook 'helm-gtags-mode)
+  (add-hook 'eshell-mode-hook 'helm-gtags-mode)
+  (add-hook 'c-mode-hook 'helm-gtags-mode)
+  (add-hook 'c++-mode-hook 'helm-gtags-mode)
+  (add-hook 'asm-mode-hook 'helm-gtags-mode))
+#+END_SRC
+
+** 42 norm
+#+BEGIN_SRC emacs-lisp
+(defun rd/normicrap-hook ()
+  (progn
+    (setq c-default-style "linux") 
+    (setq indent-tabs-mode t)
+    (setq c-basic-offset 8)
+    (setq tab-width 8)))
+(add-hook 'c-mode-hook 'rd/normicrap-hook)
+#+END_SRC
+
+** Moo jump
+Functions args works but is not on the intellij swag level
+#+BEGIN_SRC emacs-lisp
+(use-package function-args
+  :ensure t
+  :bind (("C-M-j"  . moo-jump-local))
+  :config (progn
+	    (global-semantic-idle-summary-mode 1)))
+#+END_SRC
+
+** Ws butler
+#+BEGIN_SRC emacs-lisp
+(use-package ws-butler
+  :ensure t
+  :diminish
+  :config (add-hook 'c-mode-common-hook 'ws-butler-mode))
+#+END_SRC
+** TODO Think about irony integration (checking and completion)
+* Clojure
+
+** Standart setup, clojure mode + cider
+#+BEGIN_SRC emacs-lisp
+(use-package clojure-mode
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.boot$" . clojure-mode))
+  (add-to-list 'auto-mode-alist '("\\.edn$"   . clojure-mode))
+  (add-to-list 'auto-mode-alist '("\\.cljs.*$'" . clojure-mode))
+  (add-to-list 'auto-mode-alist '("\\.clj$'"  . clojure-mode))
+  (add-hook 'clojure-mode-hook 'subword-mode))
+
+(use-package cider
+  :ensure t
+  :config
+  (add-hook 'clojure-mode-hook 'cider-mode)
+  (add-hook 'cider-mode-hook #'eldoc-mode)
+  (setq cider-repl-use-pretty-printing t))
+#+END_SRC
+
+** Refactor package
+#+BEGIN_SRC emacs-lisp
+(use-package clj-refactor
+  :ensure t
+  :config (clj-refactor-mode 1))
+
+(use-package cljr-helm
+  :ensure t
+  :bind (("C-c C-s" . cljr-helm)))
+#+END_SRC
+
+** Various minor QoL
+#+BEGIN_SRC emacs-lisp
+(use-package flycheck-clojure
+  :ensure t
+  :init (eval-after-load 'flycheck '(flycheck-clojure-setup)))
+
+(use-package clojure-mode-extra-font-locking
+  :ensure t)
+#+END_SRC
+
+* Lispy
+
+Good shiet I guess, makes me wonder about paredit and my life globally...
+#+BEGIN_SRC emacs-lisp
+(use-package lispy
+  :ensure t
+  :config
+  (define-key lispy-mode-map (kbd "[") 'lispy-brackets)
+  (define-key lispy-mode-map (kbd "J") 'special-lispy-backward)
+  (define-key lispy-mode-map (kbd "K") 'lispy-forward)
+  (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
+  (add-hook 'clojure-mode-hook (lambda () (lispy-mode 1)))
+  (add-hook 'cider-mode-hook (lambda () (lispy-mode 1)))
+  (add-hook 'cider--debug-mode-hook (lambda () (if lispy-mode
+						   (lispy-mode -1)
+						 (lispy-mode 1))))
+  (add-hook 'cider-repl-mode-hook (lambda () (lispy-mode 1))))
+#+END_SRC
+
+* Eshell
+
+The emacs shell, may it's powers be harnessed for good use
+** Funtions
+#+BEGIN_SRC emacs-lisp
+(defun eshell/bpipe (&rest command)
+  "Inserts the result of command into *pipe* buffer, globing must be quoted"
+  (let ((cmd (mapconcat 'identity command " "))
+	(buf (get-buffer-create "*pipe*")))
+    (switch-to-buffer buf)
+    (erase-buffer)
+    (insert (eshell-command-result cmd))
+    (goto-char (point-min))))
+
+;; Buffer interaction with cli, from Howardism
+(defun eshell/-buffer-as-args (buffer separator command)
+  "Takes the contents of BUFFER, and splits it on SEPARATOR, and
+runs the COMMAND with the contents as arguments. Use an argument
+`%' to substitute the contents at a particular point, otherwise,
+they are appended."
+  (let* ((lines (with-current-buffer buffer
+                  (split-string
+                   (buffer-substring-no-properties (point-min) (point-max))
+                   separator)))
+         (subcmd (if (-contains? command "%")
+                     (-flatten (-replace "%" lines command))
+                   (-concat command lines)))
+         (cmd-str  (string-join subcmd " ")))
+    (message cmd-str)
+    (eshell-command-result cmd-str)))
+
+(defun eshell/bargs (buffer &rest command)
+  "Passes the lines from BUFFER as arguments to COMMAND."
+  (eshell/-buffer-as-args buffer "\n" command))
+
+(defun eshell/sargs (buffer &rest command)
+  "Passes the words from BUFFER as arguments to COMMAND."
+  (eshell/-buffer-as-args buffer nil command))
+#+END_SRC
+
+** Quickswitch
+Assumes a *eshell* buffer is always existing
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-$") (lambda ()
+			      (interactive)
+			      (if (equal (buffer-name) "*eshell*")
+				  (mode-line-other-buffer)
+				(switch-to-buffer "*eshell*"))))
+(add-hook 'eshell-mode-hook
+	  (lambda ()
+	    (eshell-cmpl-initialize)
+	    (setenv "NODE_PATH" "/usr/lib/node_modules")
+	    (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
+	    (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
+(add-hook 'emacs-startup-hook
+	  (lambda ()
+	    (let ((default-directory (getenv "HOME")))
+	      (command-execute 'eshell)
+	      (bury-buffer))))
+#+END_SRC
+** Misc
+Big dicc, big shell history
+#+BEGIN_SRC emacs-lisp
+(setq eshell-history-size 1024)
+#+END_SRC
+* Orgmode
+
+The frontier between emacs, life and autism
+** Basic config
+#+BEGIN_SRC emacs-lisp
+(use-package org
+  :bind (("C-c c" . org-capture)
+	 ("C-c a" . org-agenda)
+	 ("C-c l" . org-store-link))
+  :config
+  (setq org-directory "~/org")
+  (setq org-agenda-files
+	(mapcar (lambda (path) (concat org-directory path))
+		'("/gtd.org")))
+  (setq org-log-done 'time)
+  (setq org-src-fontify-natively t)
+  (setq org-use-fast-todo-selection t)
+  (setq org-todo-keywords
+	'((sequence "TODO(t)" "NEXT(n)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+  (setq org-capture-templates
+	'(("t" "Todo" entry (file+headline "~/org/gtd.org" "Tasks")
+	   "* TODO %?\n")
+	  ("i" "Idea" entry (file+headline "~/org/gtd.org" "Ideas")
+	   "* %? :IDEA: \n%t")
+	  ("j" "Journal" entry (file+olp+datetree "~/org/journal.org")
+	   "* %?\nEntered on %U\n  %i\n ")
+	  ("n" "Note" entry (file "~/org/notes.org")
+	   "* %?\n")
+	  ("l" "Links" item (file+headline "~/org/links.org" "Temporary Links")
+	   "%?\nEntered on %U\n %a"))))
+#+END_SRC
+
+** Capture anywhere
+Used in conjunction with a emacs-capture script, mapped on i3
+#+BEGIN_SRC emacs-lisp
+(require 'org-capture)
+(require 'org-protocol)
+
+(defadvice org-capture
+    (after make-full-window-frame activate)
+  "Advise capture to be the only window when used as a popup"
+  (if (equal "emacs-capture" (frame-parameter nil 'name))
+      (delete-other-windows)))
+
+(defadvice org-capture-finalize
+    (after delete-capture-frame activate)
+  "Advise capture-finalize to close the frame"
+  (if (equal "emacs-capture" (frame-parameter nil 'name))
+      (delete-frame)))
+#+END_SRC
+** Reading & notes
+#+BEGIN_SRC emacs-lisp
+(use-package org-noter
+  :ensure t
+  :config (org-noter-set-auto-save-last-location t))
+(use-package pdf-tools
+  :ensure t
+  :config (pdf-tools-install)
+  (add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode)
+  (add-hook 'pdf-view-mode-hook (lambda () (local-unset-key (kbd "k")))))
+#+END_SRC
+* Elfeed
+
+Org file to handle feed list 
+#+BEGIN_SRC emacs-lisp
+(use-package elfeed-org
+  :ensure t
+  :config 
+  (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
+  (elfeed-org))
+#+END_SRC
+* Smartparens
+
+Electric pair on steroids
+#+BEGIN_SRC emacs-lisp
+(use-package smartparens
+  :ensure t
+  :config
+  (show-smartparens-global-mode 1)
+  (smartparens-global-mode 1)
+  (smartparens-strict-mode)
+  (setq sp-base-key-bindings 'paredit)
+  (setq sp-highlight-pair-overlay nil)
+  (sp-with-modes sp-lisp-modes
+    ;; disable ', it's the quote character!
+    (sp-local-pair "'" nil :actions nil)
+    ;; also only use the pseudo-quote inside strings where it serve as
+    ;; hyperlink.
+    (sp-local-pair "`" "'" :when '(sp-in-string-p sp-in-comment-p))
+    (sp-local-pair "`" nil
+		   :skip-match (lambda (ms mb me)
+				 (cond
+				  ((equal ms "'")
+				   (or (sp--org-skip-markup ms mb me)
+				       (not (sp-point-in-string-or-comment))))
+				  (t (not (sp-point-in-string-or-comment))))))))
+#+END_SRC
+* Avy
+
+You jump and shiet, will need remapping
+#+BEGIN_SRC emacs-lisp
+(use-package avy
+  :ensure t
+  :diminish
+  :bind (("C-j"   . avy-goto-word-1)
+	 ("C-S-j" . avy-goto-line)))
+#+END_SRC
+* Undo tree
+
+#+BEGIN_SRC emacs-lisp
+(use-package undo-tree
+  :ensure t
+  :diminish
+  :config
+  (global-undo-tree-mode)
+  (setq undo-tree-visualizer-timestamps t)
+  (setq undo-tree-visualizer-diff t))
+#+END_SRC
+* Guide key
+
+Because sometimes you want to discover stuff
+#+BEGIN_SRC emacs-lisp
+(use-package guide-key
+  :ensure t
+  :diminish
+  :config
+  (setq guide-key/guide-key-sequence '("C-x" "C-c" "C-h")
+	guide-key/idle-delay 0.4
+	guide-key/recursive-key-sequence-flag t
+	guide-key/popup-window-position 'right)
+  (guide-key-mode 1))
+#+END_SRC
+* Yasnippet
+
+#+BEGIN_SRC emacs-lisp
+(use-package yasnippet
+  :ensure t
+  :config (yas-global-mode 1))
+#+END_SRC
