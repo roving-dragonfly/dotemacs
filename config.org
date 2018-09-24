@@ -96,6 +96,7 @@ The best shiet since oignon rings
 	 ("C-x C-f"   . helm-find-files)
 	 ("M-y"       . helm-show-kill-ring)
 	 ("C-x b"     . helm-mini)
+	 ("<XF86Reload>"     . helm-mini)
 	 ("C-h a"     . helm-apropos)
 	 ("C-s"       . helm-occur)
 	 ("C-c h"     . helm-command-prefix))
