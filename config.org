@@ -181,13 +181,16 @@ Syntax checking
 
 ** 42 norm
 #+BEGIN_SRC emacs-lisp
+  (load-file "header-42.el")
 
   (defun rd/normicrap-hook ()
       (progn
 	(setq c-default-style "linux") 
 	(setq indent-tabs-mode t)
 	(setq c-basic-offset 4)
-	(setq tab-width 4)))
+	(setq tab-width 4)
+	(c-set-offset 'substatement-open '0)
+	(add-hook 'before-save-hook 'rd/set-header-42 nil 'local)))
     (add-hook 'c-mode-hook 'rd/normicrap-hook)
 #+END_SRC
 
@@ -218,21 +221,23 @@ Functions args works but is not on the intellij swag level
 
 ** Standart setup, clojure mode + cider
 #+BEGIN_SRC emacs-lisp
-(use-package clojure-mode
-  :ensure t
-  :config
-  (add-to-list 'auto-mode-alist '("\\.boot$" . clojure-mode))
-  (add-to-list 'auto-mode-alist '("\\.edn$"   . clojure-mode))
-  (add-to-list 'auto-mode-alist '("\\.cljs.*$'" . clojure-mode))
-  (add-to-list 'auto-mode-alist '("\\.clj$'"  . clojure-mode))
-  (add-hook 'clojure-mode-hook 'subword-mode))
-
-(use-package cider
-  :ensure t
-  :config
-  (add-hook 'clojure-mode-hook 'cider-mode)
-  (add-hook 'cider-mode-hook #'eldoc-mode)
-  (setq cider-repl-use-pretty-printing t))
+  (use-package clojure-mode
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.boot$" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("\\.edn$"   . clojure-mode))
+    (add-to-list 'auto-mode-alist '("\\.cljs.*$'" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("\\.clj$'"  . clojure-mode))
+    (add-hook 'clojure-mode-hook 'subword-mode))
+  (use-package cider
+    :ensure t
+    :config
+    (add-hook 'clojure-mode-hook 'cider-mode)
+    (add-hook 'clojure-mode-hook 'cider-mode)
+    (add-hook 'cider-mode-hook #'eldoc-mode)
+    (add-hook 'cider-repl-mode-hook 'smartparens-strict-mode)
+    (setq cider-repl-use-pretty-printing t)
+    (setq cider-default-repl-command "lein"))
 #+END_SRC
 
 ** Refactor package
@@ -243,23 +248,23 @@ Functions args works but is not on the intellij swag level
 
 (use-package cljr-helm
   :ensure t
-  :bind (("C-c C-s" . cljr-helm)))
+  :bind (("C-c C-=" . cljr-helm)))
 #+END_SRC
 
 ** Various minor QoL
 #+BEGIN_SRC emacs-lisp
-(use-package flycheck-clojure
-  :ensure t
-  :init (eval-after-load 'flycheck '(flycheck-clojure-setup)))
+  ;; (use-package flycheck-clojure
+  ;;   :ensure t
+  ;;   :init (eval-after-load 'flycheck '(flycheck-clojure-setup)))
 
-(use-package clojure-mode-extra-font-locking
-  :ensure t)
+  (use-package clojure-mode-extra-font-locking
+    :ensure t)
 #+END_SRC
 
 * Lispy
 
 Good shiet I guess, makes me wonder about paredit and my life globally...
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC no-more-crap
 (use-package lispy
   :ensure t
   :config
@@ -449,27 +454,69 @@ mpd client
 
 Electric pair on steroids
 #+BEGIN_SRC emacs-lisp
-(use-package smartparens
-  :ensure t
-  :config
-  (show-smartparens-global-mode 1)
-  (smartparens-global-mode 1)
-  (smartparens-strict-mode)
-  (setq sp-base-key-bindings 'paredit)
-  (setq sp-highlight-pair-overlay nil)
-  (sp-with-modes sp-lisp-modes
-    ;; disable ', it's the quote character!
-    (sp-local-pair "'" nil :actions nil)
-    ;; also only use the pseudo-quote inside strings where it serve as
-    ;; hyperlink.
-    (sp-local-pair "`" "'" :when '(sp-in-string-p sp-in-comment-p))
-    (sp-local-pair "`" nil
-		   :skip-match (lambda (ms mb me)
-				 (cond
-				  ((equal ms "'")
-				   (or (sp--org-skip-markup ms mb me)
-				       (not (sp-point-in-string-or-comment))))
-				  (t (not (sp-point-in-string-or-comment))))))))
+  (use-package smartparens
+    :ensure t
+    :config
+    (require 'smartparens-config)
+    (show-smartparens-global-mode 1)
+    (smartparens-global-mode 1)
+    (add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
+    (setq sp-highlight-pair-overlay nil)
+    (bind-keys
+     :map smartparens-strict-mode-map
+     ("C-M-a" . sp-beginning-of-sexp)
+     ("C-M-e" . sp-end-of-sexp)
+
+     ("C-<down>" . sp-down-sexp)
+     ("C-<up>"   . sp-up-sexp)
+     ("M-<down>" . sp-backward-down-sexp)
+     ("M-<up>"   . sp-backward-up-sexp)
+
+     ("C-M-f" . sp-forward-sexp)
+     ("C-M-b" . sp-backward-sexp)
+
+     ("C-M-n" . sp-next-sexp)
+     ("C-M-p" . sp-previous-sexp)
+
+     ("C-S-f" . sp-forward-symbol)
+     ("C-S-b" . sp-backward-symbol)
+   
+     ("C-." . sp-forward-slurp-sexp)
+     ("C-,"  . sp-forward-barf-sexp)
+     ("M-." . sp-backward-slurp-sexp)
+     ("M-,"  . sp-backward-barf-sexp)
+
+     ("C-M-t" . sp-transpose-sexp)
+     ("C-M-k" . sp-kill-sexp)
+     ("C-k"   . sp-kill-hybrid-sexp)
+     ("C-M-w" . sp-copy-sexp)
+     ("C-M-d" . delete-sexp)
+
+     ("M--" . sp-backward-unwrap-sexp)
+     ("M-=" . sp-unwrap-sexp)
+
+     ("C-x C-t" . sp-transpose-hybrid-sexp)
+
+     ("C-c ("  . wrap-with-parens)
+     ("C-c ["  . wrap-with-brackets)
+     ("C-c {"  . wrap-with-braces)
+     ("C-c '"  . wrap-with-single-quotes)
+     ("C-c \"" . wrap-with-double-quotes)
+     ("C-c _"  . wrap-with-underscores)
+     ("C-c `"  . wrap-with-back-quotes)))
+    ;; (sp-with-modes sp-lisp-modes
+    ;;     ;; disable ', it's the quote character!
+    ;;     (sp-local-pair "'" nil :actions nil)
+    ;;     ;; also only use the pseudo-quote inside strings where it serve as
+    ;;     ;; hyperlink.
+    ;;     (sp-local-pair "`" "'" :when '(sp-in-string-p sp-in-comment-p))
+    ;;     (sp-local-pair "`" nil
+    ;; 		   :skip-match (lambda (ms mb me)
+    ;; 				 (cond
+    ;; 				  ((equal ms "'")
+    ;; 				   (or (sp--org-skip-markup ms mb me)
+    ;; 				       (not (sp-point-in-string-or-comment))))
+    ;; 				  (t (not (sp-point-in-string-or-comment)))))))
 #+END_SRC
 * Avy
 
@@ -512,4 +559,12 @@ Because sometimes you want to discover stuff
 (use-package yasnippet
   :ensure t
   :config (yas-global-mode 1))
+#+END_SRC
+* Ace window
+#+BEGIN_SRC emacs-lisp
+  (use-package ace-window
+    :ensure t
+    :bind ("C-x o" . ace-window)
+    :config
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 #+END_SRC

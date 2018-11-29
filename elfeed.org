@@ -1,0 +1,30 @@
+* Feeds                                                              :elfeed:
+** Blog                                                                :blog:
+*** Dev                                                                 :dev:
+**** Clojure                                                    :clojure:
+***** [[https://dragan.rocks/feed.xml][dragan.rocks]]
+***** [[https://byorgey.wordpress.com/feed/][byorgey]]
+***** [[http://slipset.github.io/atom.xml][eric assum]]
+***** [[http://blog.brunobonacci.com/feed.xml][bits and pieces]]
+***** [[https://vvvvalvalval.github.io/feed.xml][vvvalvalval]]
+**** Emacs                                                            :emacs:
+***** [[http://pragmaticemacs.com/feed/][pragmatic emacs]]
+**** Misc
+***** [[http://nullprogram.com/feed/][null program]]
+***** [[https://blog.frankel.ch/feed.xml][a java geek]]
+***** [[http://cachestocaches.com/feed/][caches to caches]]
+***** [[http://sulami.github.io/atom.xml][sulami]]
+** Youtube                                                          :youtube:
+*** Math                                                               :math:
+**** [[https://www.youtube.com/feeds/videos.xml?channel_id=UConVfxXodg78Tzh5nNu85Ew][welch labs]]
+**** [[https://www.youtube.com/feeds/videos.xml?channel_id=UC1_uAIS3r8Vu6JjXWvastJg][mathologer]]
+*** Politics                                                            :pol:
+**** [[https://www.youtube.com/feeds/videos.xml?channel_id=UC2qlgiYCCtaYpn2_blX01xg][anal genocide]]
+**** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCmrLCXSDScliR7q8AxxjvXg][black pigeon]]
+**** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCeXsZz8C5sUZe1YgDxR6j9A][pixel mort]]
+**** [[https://www.youtube.com/feeds/videos.xml?channel_id=UC_7s3D3-x_KfZDTo-6sI6uQ][le rektorat]]
+**** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCVwXxF80Sn_C84E4jZ5TKgw][corbac reac]]
+*** Hack                                                               :hack:
+**** [[https://www.youtube.com/feeds/videos.xml?channel_id=UClcE-kVhqyiHCcjYwcpfj9w][liveoverflow]]
+*** Tech                                                               :tech:
+**** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCSX3MR0gnKDxyXAyljWzm0Q][kevin drumm]]
