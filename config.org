@@ -181,7 +181,7 @@ Syntax checking
 
 ** 42 norm
 #+BEGIN_SRC emacs-lisp
-  (load-file "header-42.el")
+  (load-file (concat user-emacs-directory "header-42.el"))
 
   (defun rd/normicrap-hook ()
       (progn
@@ -261,6 +261,16 @@ Functions args works but is not on the intellij swag level
     :ensure t)
 #+END_SRC
 
+* Common Lisp
+
+** Slime
+#+BEGIN_SRC emacs-lisp
+  (use-package slime
+    :ensure t
+    :config
+    (setq inferior-lisp-program "/usr/bin/sbcl")
+    (setq slime-contribs '(slime-fancy slime-company)))
+#+END_SRC
 * Lispy
 
 Good shiet I guess, makes me wonder about paredit and my life globally...
@@ -323,22 +333,24 @@ they are appended."
 ** Quickswitch
 Assumes a *eshell* buffer is always existing
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-$") (lambda ()
-			      (interactive)
-			      (if (equal (buffer-name) "*eshell*")
-				  (mode-line-other-buffer)
-				(switch-to-buffer "*eshell*"))))
-(add-hook 'eshell-mode-hook
-	  (lambda ()
-	    (eshell-cmpl-initialize)
-	    (setenv "NODE_PATH" "/usr/lib/node_modules")
-	    (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
-	    (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
-(add-hook 'emacs-startup-hook
-	  (lambda ()
-	    (let ((default-directory (getenv "HOME")))
-	      (command-execute 'eshell)
-	      (bury-buffer))))
+  (global-set-key (kbd "C-$") (lambda ()
+				(interactive)
+				(if (equal (buffer-name) "*eshell*")
+				    (mode-line-other-buffer)
+				  (switch-to-buffer "*eshell*"))))
+  (add-hook 'eshell-mode-hook
+	    (lambda ()
+	      (smartparens-strict-mode t)
+	      (eshell-cmpl-initialize)
+	      (setenv "NODE_PATH" "/usr/lib/node_modules")
+	      (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
+	      (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
+  (setq helm-show-completion-display-function #'helm-show-completion-default-display-function)
+  (add-hook 'emacs-startup-hook
+	    (lambda ()
+	      (let ((default-directory (getenv "HOME")))
+		(command-execute 'eshell)
+		(bury-buffer))))
 #+END_SRC
 ** Misc
 Big dicc, big shell history
@@ -461,6 +473,7 @@ Electric pair on steroids
     (show-smartparens-global-mode 1)
     (smartparens-global-mode 1)
     (add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
+    (add-hook 'cider-repl-mode-hook 'turn-on-smartparens-strict-mode)
     (setq sp-highlight-pair-overlay nil)
     (bind-keys
      :map smartparens-strict-mode-map
@@ -480,7 +493,7 @@ Electric pair on steroids
 
      ("C-S-f" . sp-forward-symbol)
      ("C-S-b" . sp-backward-symbol)
-   
+
      ("C-." . sp-forward-slurp-sexp)
      ("C-,"  . sp-forward-barf-sexp)
      ("M-." . sp-backward-slurp-sexp)
@@ -566,6 +579,7 @@ Add ranger swagg to dired mode
   (use-package ranger
     :ensure t
     :config
+    (setq ranger-override-dired t)
     (setq ranger-cleanup-on-disable t)
     (setq ranger-show-hidden t))
 
