@@ -259,6 +259,9 @@ Functions args works but is not on the intellij swag level
 
   (use-package clojure-mode-extra-font-locking
     :ensure t)
+  (require 'ob-clojure)
+  (setq org-babel-clojure-backend 'cider)
+
 #+END_SRC
 
 * Common Lisp
@@ -417,6 +420,7 @@ Used in conjunction with a emacs-capture script, mapped on i3
   :config (pdf-tools-install)
   (add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode)
   (add-hook 'pdf-view-mode-hook (lambda () (local-unset-key (kbd "k")))))
+(setq org-src-tabs-act-natively t)
 #+END_SRC
 * Elfeed
 ** Basic config
