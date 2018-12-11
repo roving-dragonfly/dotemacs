@@ -1,0 +1,5 @@
+alias ydl youtube-dl -o "~/Videos/%(title)s.%(ext)s" $*
+alias mptube youtube-dl --extract-audio --audio-format mp3 -o "~/Music/%(title)s.%(ext)s" $*
+alias wget wget -c
+alias chx chmod +x $*
+alias ll ls -la $*
