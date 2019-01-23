@@ -30,7 +30,7 @@
 
 (defun rd/header-date-line (name)
   "Return a date line with name as (NAME)."
-  (concat (time-stamp-string "%:y/%:m/%:d %02H:%02M:%02S") " by " rd/username))
+  (concat (time-stamp-string "%:y/%02m/%02d %02H:%02M:%02S") " by " rd/username))
 
 (defun rd/insert-over (str)
   "Insert a string as (STR) in overwrite fashion."
