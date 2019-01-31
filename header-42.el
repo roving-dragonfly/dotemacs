@@ -26,7 +26,7 @@
 
 (defun rd/header-author-line (name)
   "Return a author line with name as (NAME)."
-  (concat rd/username " <" rd/username "@42.fr>"))
+  (concat rd/username " <" rd/username "@student.42.fr>"))
 
 (defun rd/header-date-line (name)
   "Return a date line with name as (NAME)."
